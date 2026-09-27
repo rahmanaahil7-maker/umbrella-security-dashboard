@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Queen | Security Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Navbar with Title on Left, Auth on Top-Right -->
+        <header class="navbar">
+            <div class="brand-title">
+                <h1 class="glowing-title">RED QUEEN CRYPTOGRAPHIC RESILIENCE ENGINE</h1>
+                <p>Automated vulnerability auditing and parallel search-space exhaustion.</p>
+            </div>
+            <div class="auth-top-right" id="authSection">
+                <span id="userBadge" class="status-badge guest">SYS.STATUS: GUEST</span>
+                <button id="loginModalBtn" class="btn-outline" onclick="toggleAuthModal()">AUTHENTICATE</button>
+            </div>
+        </header>
+
+        <!-- Control Console -->
+        <section class="panel control-panel">
+            <div class="input-group flex-fill">
+                <label>TARGET STRING / PAYLOAD</label>
+                <input type="text" id="targetPassword" placeholder="Enter string for decryption..." value="c2">
+            </div>
+            <div class="input-group">
+                <label>HASH PROTOCOL</label>
+                <select id="algoSelect">
+                    <option value="sha256" selected>SHA-256 (Standard)</option>
+                    <option value="md5">MD5 (Legacy)</option>
+                    <option value="bcrypt">bcrypt (Cost 10)</option>
+                </select>
+            </div>
+            <div class="action-group">
+                <button id="runPipelineBtn" class="btn-primary" onclick="runCompletePipeline()">INITIATE AUDIT</button>
+                <button id="downloadPdfBtn" class="btn-secondary" onclick="requestPdfReport()">EXPORT INTEL</button>
+            </div>
+        </section>
+
+        <!-- Metrics -->
+        <section class="metrics-grid">
+            <div class="metric-box">
+                <span class="label">Mathematical Entropy</span>
+                <span id="kpiEntropy" class="value">--</span>
+            </div>
+            <div class="metric-box">
+                <span class="label">Parallel Hash Rate</span>
+                <span id="kpiHashRate" class="value">--</span>
+            </div>
+            <div class="metric-box">
+                <span class="label">Markov Perplexity</span>
+                <span id="kpiPerplexity" class="value">--</span>
+            </div>
+            <div class="metric-box">
+                <span class="label">System Verdict</span>
+                <span id="kpiVerdict" class="value verdict-idle">STANDBY</span>
+            </div>
+        </section>
+
+        <!-- Data Visualizations -->
+        <section class="data-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <h3><span class="indicator"></span> AI Heuristics (Red Queen)</h3>
+                </div>
+                <div id="aiConsole" class="terminal">Waiting for target input...</div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3><span class="indicator"></span> Multithreaded Execution</h3>
+                </div>
+                <div id="attackConsole" class="terminal">Parallel worker pool idle.</div>
+            </div>
+
+            <div class="panel span-full">
+                <div class="panel-header">
+                    <h3><span class="indicator"></span> Search Space Trajectory</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="searchSpaceChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel span-full">
+                <div class="panel-header">
+                    <h3><span class="indicator"></span> Cryptographic Baseline Comparison</h3>
+                </div>
+                <table class="corporate-table">
+                    <thead>
+                        <tr>
+                            <th>Hardware Infrastructure</th>
+                            <th>Protocol</th>
+                            <th>Measured Throughput</th>
+                            <th>Est. 8-Char Exhaustion</th>
+                        </tr>
+                    </thead>
+                    <tbody id="benchmarkTableBody">
+                        <tr class="highlight-row">
+                            <td>Active Hive Node (Local)</td>
+                            <td id="liveAlgo">SHA-256</td>
+                            <td id="liveRate">--</td>
+                            <td id="liveExhaust">--</td>
+                        </tr>
+                        <tr>
+                            <td>Standard CPU Core</td>
+                            <td>MD5</td>
+                            <td>~4.5 MH/s</td>
+                            <td>~1.4 Days</td>
+                        </tr>
+                        <tr>
+                            <td>Dedicated GPU Array (RTX 4090)</td>
+                            <td>SHA-256</td>
+                            <td>28.5 GH/s</td>
+                            <td>~3.4 Minutes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer at the Very Bottom (Seen on Scroll) -->
+        <footer class="site-footer">
+            <img src="{{ url_for('static', filename='umbrella_logo.png') }}" alt="Umbrella Corporation Logo" class="footer-logo">
+            <h2>UMBRELLA CORPORATION</h2>
+            <span class="division">APPLIED CRYPTOGRAPHY DIV.</span>
+            <p class="tagline">"Our business is life itself."</p>
+            <div class="footer-meta">
+                REF: SEC-PROJ-RQ-2026 | AUTHORIZED PERSONNEL ONLY<br>
+                OPERATIVE: <span class="glowing-sig">AK007</span>
+            </div>
+        </footer>
+
+        <!-- Auth Modal -->
+        <div id="authModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="authTitle">SECURE LOGIN</h3>
+                </div>
+                <div class="auth-tabs">
+                    <button id="tabLogin" class="tab-btn active" onclick="switchAuthTab('login')">LOGIN</button>
+                    <button id="tabRegister" class="tab-btn" onclick="switchAuthTab('register')">REGISTER</button>
+                </div>
+                <div class="input-group">
+                    <label>CLEARANCE ID (USERNAME)</label>
+                    <input type="text" id="modalUser" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label>PASSPHRASE</label>
+                    <input type="password" id="modalPass">
+                </div>
+                <div class="modal-actions">
+                    <button id="authSubmitBtn" class="btn-primary" onclick="submitAuth()">AUTHENTICATE</button>
+                    <button class="btn-outline" onclick="toggleAuthModal()">CANCEL</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
